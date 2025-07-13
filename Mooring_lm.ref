@@ -1,0 +1,386 @@
+reference : 50001,
+	reference, global, XFP1,  YFP1,  ZFP1,
+	reference, global, eye,
+	reference, global, null,
+	reference, global, null;
+
+reference: 51001,
+     reference, global, 42.405860, 0.0, -95.505150,
+     reference, global, eye,
+     reference, global, null,
+     reference, global, null;
+
+reference: 51002,
+     reference, global, 80.298413, 0.0, -119.978272,
+     reference, global, eye,
+     reference, global, null,
+     reference, global, null;
+
+reference: 51003,
+     reference, global, 118.872697, 0.0, -143.361901,
+     reference, global, eye,
+     reference, global, null,
+     reference, global, null;
+    
+reference: 51004,
+     reference, global, 158.120069, 0.0, -165.597077,
+     reference, global, eye,
+     reference, global, null,
+     reference, global, null;
+
+reference: 51005,
+     reference, global, 198.027820, 0.0, -186.623730,
+     reference, global, eye,
+     reference, global, null,
+     reference, global, null;
+    
+reference: 51006,
+     reference, global, 238.578808, 0.0, -206.381140,
+     reference, global, eye,
+     reference, global, null,
+     reference, global, null;
+    
+reference: 51007,
+     reference, global, 279.751124, 0.0, -224.808494,
+     reference, global, eye,
+     reference, global, null,
+     reference, global, null;
+    
+reference: 51008,
+     reference, global, 321.517805, 0.0, -241.845527,
+     reference, global, eye,
+     reference, global, null,
+     reference, global, null;
+    
+reference: 51009,
+     reference, global, 363.846619, 0.0, -257.433240,
+     reference, global, eye,
+     reference, global, null,
+     reference, global, null;
+    
+reference: 51010,
+     reference, global, 406.699943, 0.0, -271.514699,
+     reference, global, eye,
+     reference, global, null,
+     reference, global, null;
+    
+reference: 51011,
+     reference, global, 450.034743, 0.0, -284.035881,
+     reference, global, eye,
+     reference, global, null,
+     reference, global, null;
+    
+reference: 51012,
+     reference, global, 493.802685, 0.0, -294.946562,
+     reference, global, eye,
+     reference, global, null,
+     reference, global, null;
+
+reference: 51013,
+     reference, global, 537.950379, 0.0, -304.201209,
+     reference, global, eye,
+     reference, global, null,
+     reference, global, null;
+
+reference: 51014,
+     reference, global, 582.419776, 0.0, -311.759846,
+     reference, global, eye,
+     reference, global, null,
+     reference, global, null;
+    
+reference: 51015,
+     reference, global, 627.148701, 0.0, -317.588865,
+     reference, global, eye,
+     reference, global, null,
+     reference, global, null;
+
+reference: 51016,
+     reference, global, 672.071540, 0.0, -321.661739,
+     reference, global, eye,
+     reference, global, null,
+     reference, global, null;
+
+reference: 51017,
+     reference, global, 717.120032, 0.0, -323.959614,
+     reference, global, eye,
+     reference, global, null,
+     reference, global, null;
+    
+reference: 51018,
+     reference, global, 762.224169, 0.0, -324.471730,
+     reference, global, eye,
+     reference, global, null,
+     reference, global, null;
+    
+reference: 51019,
+     reference, global, 807.313165, 0.0, -323.195680,
+     reference, global, eye,
+     reference, global, null,
+     reference, global, null;
+
+reference : 51999,
+	reference, global, XAP1,  YAP1,  ZAP1,
+	reference, global, eye,
+	reference, global, null,
+	reference, global, null;
+
+# =================================================================
+# === Mooring Line 2 Initial Values
+# =================================================================
+
+reference : 50002,
+	reference, global, XFP2,  YFP2,  ZFP2,
+	reference, global, eye,
+	reference, global, null,
+	reference, global, null;
+
+reference: 52001, 
+     reference, global, -21.202930, 36.724552, -95.505150, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 52002, 
+     reference, global, -40.149207, 69.540466, -119.978272, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 52003, 
+     reference, global, -59.436348, 102.946775, -143.361901, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 52004, 
+     reference, global, -79.060034, 136.935996, -165.597077, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 52005, 
+     reference, global, -99.013910, 171.497122, -186.623730, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 52006, 
+     reference, global, -119.289404, 206.615309, -206.381140, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 52007, 
+     reference, global, -139.875562, 242.271580, -224.808494, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 52008, 
+     reference, global, -160.758902, 278.442586, -241.845527, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 52009, 
+     reference, global, -181.923309, 315.100415, -257.433240, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 52010, 
+     reference, global, -203.349971, 352.212482, -271.514699, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 52011, 
+     reference, global, -225.017372, 389.741520, -284.035881, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 52012, 
+     reference, global, -246.901343, 427.645670, -294.946562, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 52013, 
+     reference, global, -268.975190, 465.878694, -304.201209, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 52014, 
+     reference, global, -291.209888, 504.390321, -311.759846, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 52015, 
+     reference, global, -313.574351, 543.126707, -317.588865, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 52016, 
+     reference, global, 
+     -336.035770, 582.031027, -321.661739, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 52017, 
+     reference, global, -358.560016, 621.044165, -323.959614, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 52018, 
+     reference, global, -381.112085, 660.105494, -324.471730, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 52019, 
+     reference, global, -403.656583, 699.153710, -323.195680, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference : 52999,
+	reference, global, XAP2,  YAP2,  ZAP2,
+	reference, global, eye,
+	reference, global, null,
+	reference, global, null;
+
+# =================================================================
+# === Mooring Line 3 Initial Values
+# =================================================================
+
+reference : 50003,
+	reference, global, XFP3,  YFP3,  ZFP3,
+	reference, global, eye,
+	reference, global, null,
+	reference, global, null;
+
+reference: 53001, 
+     reference, global, -21.202930, -36.724552, -95.505150, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 53002, 
+     reference, global, -40.149207, -69.540466, -119.978272, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 53003, 
+     reference, global, -59.436348, -102.946775, -143.361901, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 53004, 
+     reference, global, -79.060034, -136.935996, -165.597077, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 53005, 
+     reference, global, -99.013910, -171.497122, -186.623730, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 53006, 
+     reference, global, -119.289404, -206.615309, -206.381140, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 53007, 
+     reference, global, -139.875562, -242.271580, -224.808494, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 53008, 
+     reference, global, -160.758902, -278.442586, -241.845527, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 53009, 
+     reference, global, -181.923309, -315.100415, -257.433240, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 53010, 
+     reference, global, -203.349971, -352.212482, -271.514699, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 53011, 
+     reference, global, -225.017372, -389.741520, -284.035881, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 53012, 
+     reference, global, -246.901343, -427.645670, -294.946562, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 53013, 
+     reference, global, -268.975190, -465.878694, -304.201209, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 53014, 
+     reference, global, -291.209888, -504.390321, -311.759846, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 53015, 
+     reference, global, -313.574351, -543.126707, -317.588865, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 53016, 
+     reference, global, -336.035770, -582.031027, -321.661739, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 53017, 
+     reference, global, -358.560016, -621.044165, -323.959614, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 53018, 
+     reference, global, -381.112085, -660.105494, -324.471730, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference: 53019, 
+     reference, global, -403.656583, -699.153710, -323.195680, 
+     reference, global, eye, 
+     reference, global, null, 
+     reference, global, null;
+
+reference : 53999,
+	reference, global, XAP3,  YAP3,  ZAP3,
+	reference, global, eye,
+	reference, global, null,
+	reference, global, null;
