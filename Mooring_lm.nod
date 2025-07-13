@@ -1,0 +1,455 @@
+# Fairlead Node 1 (static, but its motion refers to platform node 1)
+structural: 50001, static,
+    reference, 50001, null,
+    reference, 50001, eye, 
+    reference, 50001, null,
+    reference, 50001, null;
+
+# --- Virtual Nodes for Line 1 (dynamic) ---
+structural: 51001, 
+    dynamic,
+    reference, 51001, null,
+    reference, 51001, eye, 
+    reference, 51001, null, 
+    reference, 51001, null;
+
+structural: 51002, 
+    dynamic,
+    reference, 51002, null,
+    reference, 51002, eye, 
+    reference, 51002, null, 
+    reference, 51002, null;
+
+structural: 51003, 
+    dynamic,
+    reference, 51003, null,
+    reference, 51003, eye, 
+    reference, 51003, null, 
+    reference, 51003, null;
+
+structural: 51004, 
+    dynamic,
+    reference, 51004, null,
+    reference, 51004, eye, 
+    reference, 51004, null, 
+    reference, 51004, null;
+
+structural: 51005, 
+    dynamic,
+    reference, 51005, null,
+    reference, 51005, eye, 
+    reference, 51005, null, 
+    reference, 51005, null;
+
+structural: 51006, 
+    dynamic,
+    reference, 51006, null,
+    reference, 51006, eye, 
+    reference, 51006, null, 
+    reference, 51006, null;
+
+structural: 51007, 
+    dynamic,
+    reference, 51007, null,
+    reference, 51007, eye, 
+    reference, 51007, null, 
+    reference, 51007, null;
+
+structural: 51008, 
+    dynamic,
+    reference, 51008, null,
+    reference, 51008, eye, 
+    reference, 51008, null, 
+    reference, 51008, null;
+
+structural: 51009, 
+    dynamic,
+    reference, 51009, null,
+    reference, 51009, eye, 
+    reference, 51009, null, 
+    reference, 51009, null;
+
+structural: 51010, 
+    dynamic,
+    reference, 51010, null,
+    reference, 51010, eye, 
+    reference, 51010, null, 
+    reference, 51010, null;
+
+structural: 51011, 
+    dynamic,
+    reference, 51011, null,
+    reference, 51011, eye, 
+    reference, 51011, null, 
+    reference, 51011, null;
+
+structural: 51012, 
+    dynamic,
+    reference, 51012, null,
+    reference, 51012, eye, 
+    reference, 51012, null, 
+    reference, 51012, null;
+
+structural: 51013, 
+    dynamic,
+    reference, 51013, null,
+    reference, 51013, eye, 
+    reference, 51013, null, 
+    reference, 51013, null;
+
+structural: 51014, 
+    dynamic,
+    reference, 51014, null,
+    reference, 51014, eye, 
+    reference, 51014, null, 
+    reference, 51014, null;
+
+structural: 51015, 
+    dynamic,
+    reference, 51015, null,
+    reference, 51015, eye, 
+    reference, 51015, null, 
+    reference, 51015, null;
+
+structural: 51016, 
+    dynamic,
+    reference, 51016, null,
+    reference, 51016, eye, 
+    reference, 51016, null, 
+    reference, 51016, null;
+
+structural: 51017, 
+    dynamic,
+    reference, 51017, null,
+    reference, 51017, eye, 
+    reference, 51017, null, 
+    reference, 51017, null;
+
+structural: 51018, 
+    dynamic,
+    reference, 51018, null,
+    reference, 51018, eye, 
+    reference, 51018, null, 
+    reference, 51018, null;
+
+structural: 51019, 
+    dynamic,
+    reference, 51019, null,
+    reference, 51019, eye, 
+    reference, 51019, null, 
+    reference, 51019, null;
+
+# Anchor Node for Line 1 (static, fixed in space)
+structural: 51999, static,
+    reference, 51999, null,
+    reference, 51999, eye,
+    reference, 51999, null,
+    reference, 51999, null;
+
+# =================================================================
+# === Mooring Line 2 Nodes
+# =================================================================
+
+# Fairlead Node 2 (references platform node 2)
+
+structural: 50002, static,
+    reference, 50002, null,
+    reference, 50002, eye, 
+    reference, 50002, null,
+    reference, 50002, null;
+
+# --- Virtual Nodes for Line 2 ---
+
+structural: 52001, 
+    dynamic,
+    reference, 52001, null,
+    reference, 52001, eye, 
+    reference, 52001, null, 
+    reference, 52001, null;
+
+structural: 52002, 
+    dynamic,
+    reference, 52002, null,
+    reference, 52002, eye, 
+    reference, 52002, null, 
+    reference, 52002, null;
+
+structural: 52003, 
+    dynamic,
+    reference, 52003, null,
+    reference, 52003, eye, 
+    reference, 52003, null, 
+    reference, 52003, null;
+
+structural: 52004, 
+    dynamic,
+    reference, 52004, null,
+    reference, 52004, eye, 
+    reference, 52004, null, 
+    reference, 52004, null;
+
+structural: 52005, 
+    dynamic,
+    reference, 52005, null,
+    reference, 52005, eye, 
+    reference, 52005, null, 
+    reference, 52005, null;
+
+structural: 52006, 
+    dynamic,
+    reference, 52006, null,
+    reference, 52006, eye, 
+    reference, 52006, null, 
+    reference, 52006, null;
+
+structural: 52007, 
+    dynamic,
+    reference, 52007, null,
+    reference, 52007, eye, 
+    reference, 52007, null, 
+    reference, 52007, null;
+
+structural: 52008, 
+    dynamic,
+    reference, 52008, null,
+    reference, 52008, eye, 
+    reference, 52008, null, 
+    reference, 52008, null;
+
+structural: 52009, 
+    dynamic,
+    reference, 52009, null,
+    reference, 52009, eye, 
+    reference, 52009, null, 
+    reference, 52009, null;
+
+structural: 52010, 
+    dynamic,
+    reference, 52010, null,
+    reference, 52010, eye, 
+    reference, 52010, null, 
+    reference, 52010, null;
+
+structural: 52011, 
+    dynamic,
+    reference, 52011, null,
+    reference, 52011, eye, 
+    reference, 52011, null, 
+    reference, 52011, null;
+
+structural: 52012, 
+    dynamic,
+    reference, 52012, null,
+    reference, 52012, eye, 
+    reference, 52012, null, 
+    reference, 52012, null;
+
+structural: 52013, 
+    dynamic,
+    reference, 52013, null,
+    reference, 52013, eye, 
+    reference, 52013, null, 
+    reference, 52013, null;
+
+structural: 52014, 
+    dynamic,
+    reference, 52014, null,
+    reference, 52014, eye, 
+    reference, 52014, null, 
+    reference, 52014, null;
+
+structural: 52015, 
+    dynamic,
+    reference, 52015, null,
+    reference, 52015, eye, 
+    reference, 52015, null, 
+    reference, 52015, null;
+
+structural: 52016, 
+    dynamic,
+    reference, 52016, null,
+    reference, 52016, eye, 
+    reference, 52016, null, 
+    reference, 52016, null;
+
+structural: 52017, 
+    dynamic,
+    reference, 52017, null,
+    reference, 52017, eye, 
+    reference, 52017, null, 
+    reference, 52017, null;
+
+structural: 52018, 
+    dynamic,
+    reference, 52018, null,
+    reference, 52018, eye, 
+    reference, 52018, null, 
+    reference, 52018, null;
+
+structural: 52019, 
+    dynamic,
+    reference, 52019, null,
+    reference, 52019, eye, 
+    reference, 52019, null, 
+    reference, 52019, null;
+
+# Anchor Node for Line 2
+
+structural: 52999, static,
+    reference, 52999, null,
+    reference, 52999, eye,
+    reference, 52999, null,
+    reference, 52999, null;
+
+# =================================================================
+# === Mooring Line 3 Nodes
+# =================================================================
+
+# Fairlead Node 3 (references platform node 3)
+structural: 50003, static, 
+    reference, 50003, null, 
+    reference, 50003, eye, 
+    reference, 50003, null, 
+    reference, 50003, null;
+
+# --- Virtual Nodes for Line 3 ---
+
+structural: 53001, 
+    dynamic,
+    reference, 53001, null,
+    reference, 53001, eye, 
+    reference, 53001, null, 
+    reference, 53001, null;
+
+structural: 53002, 
+    dynamic,
+    reference, 53002, null,
+    reference, 53002, eye, 
+    reference, 53002, null, 
+    reference, 53002, null;
+
+structural: 53003, 
+    dynamic,
+    reference, 53003, null,
+    reference, 53003, eye, 
+    reference, 53003, null, 
+    reference, 53003, null;
+
+structural: 53004, 
+    dynamic,
+    reference, 53004, null,
+    reference, 53004, eye, 
+    reference, 53004, null, 
+    reference, 53004, null;
+
+structural: 53005, 
+    dynamic,
+    reference, 53005, null,
+    reference, 53005, eye, 
+    reference, 53005, null, 
+    reference, 53005, null;
+
+structural: 53006, 
+    dynamic,
+    reference, 53006, null,
+    reference, 53006, eye, 
+    reference, 53006, null, 
+    reference, 53006, null;
+
+structural: 53007, 
+    dynamic,
+    reference, 53007, null,
+    reference, 53007, eye, 
+    reference, 53007, null, 
+    reference, 53007, null;
+
+structural: 53008, 
+    dynamic,
+    reference, 53008, null,
+    reference, 53008, eye, 
+    reference, 53008, null, 
+    reference, 53008, null;
+
+structural: 53009, 
+    dynamic,
+    reference, 53009, null,
+    reference, 53009, eye, 
+    reference, 53009, null, 
+    reference, 53009, null;
+
+structural: 53010, 
+    dynamic,
+    reference, 53010, null,
+    reference, 53010, eye, 
+    reference, 53010, null, 
+    reference, 53010, null;
+
+structural: 53011, 
+    dynamic,
+    reference, 53011, null,
+    reference, 53011, eye, 
+    reference, 53011, null, 
+    reference, 53011, null;
+
+structural: 53012, 
+    dynamic,
+    reference, 53012, null,
+    reference, 53012, eye, 
+    reference, 53012, null, 
+    reference, 53012, null;
+
+structural: 53013, 
+    dynamic,
+    reference, 53013, null,
+    reference, 53013, eye, 
+    reference, 53013, null, 
+    reference, 53013, null;
+
+structural: 53014, 
+    dynamic,
+    reference, 53014, null,
+    reference, 53014, eye, 
+    reference, 53014, null, 
+    reference, 53014, null;
+
+structural: 53015, 
+    dynamic,
+    reference, 53015, null,
+    reference, 53015, eye, 
+    reference, 53015, null, 
+    reference, 53015, null;
+
+structural: 53016, 
+    dynamic,
+    reference, 53016, null,
+    reference, 53016, eye, 
+    reference, 53016, null, 
+    reference, 53016, null;
+
+structural: 53017, 
+    dynamic,
+    reference, 53017, null,
+    reference, 53017, eye, 
+    reference, 53017, null, 
+    reference, 53017, null;
+
+structural: 53018, 
+    dynamic,
+    reference, 53018, null,
+    reference, 53018, eye, 
+    reference, 53018, null, 
+    reference, 53018, null;
+
+structural: 53019, 
+    dynamic,
+    reference, 53019, null,
+    reference, 53019, eye, 
+    reference, 53019, null, 
+    reference, 53019, null;
+
+# Anchor Node for Line 3
+structural: 53999, static,
+    reference, 53999, null,
+    reference, 53999, eye,
+    reference, 53999, null,
+    reference, 53999, null;
