@@ -1,0 +1,353 @@
+
+# mbdyn -f NREL5MW_OC3Hywind_MBDyn_lm.mbd -o results
+
+#----------------------- modules --------------------------------------
+
+module load: "/usr/local/mbdyn/libexec/libmodule-spardyn_b1.11.la";
+module load: "/usr/local/mbdyn/libexec/libmodule-catenary_lm";
+module load: "/usr/local/mbdyn/libexec/libmodule-aerodyn13_b1.09.la";
+
+#----------------------- variable---------------------------------------
+
+set : real InitialTime		= 0.0;
+set : real FinalTime		= 500.0;
+set : real TimeStep		= 0.01;
+set : real outputTimeStep	= 0.2;
+
+#------------------------simulation control ----------------------------
+
+set : real InitRotSpd		= 0.0; # [rad/s]
+set : real InitRotSpdContTime	= 2.5*TimeStep;
+
+set : real PitchContTime	= 2.5*TimeStep;
+set : real VSControlOnTime	= 2.5*TimeStep;
+set : real PitchContolOnTime	= 2.5*TimeStep;
+set : real StartAeroTime	= 2.5*TimeStep;
+set : real StartTorqueTime	= 2.5*TimeStep;
+
+set : real AeroRampTime		= 10.0; # Ramping time for Aerodynamic loads (s)
+set : real TorqueRampTime	= 10.0; # Ramping time for Torque controller (s)
+set : real RampGravity		= 10.0; # Ramping time for Gravity (s)
+set : real ForceRampTime	= 10.0; # Ramping time for force (s)
+
+#-------------------- output control -------------------------------------
+
+#set : integer oflag		= 0; #output OFF
+set : integer oflag		= 1; #output ON
+
+#--------------------- Model definitios ----------------------------------
+
+set : real Gravity		= 9.80665; # m/s^2
+set : real Rho			= 1025.0; # kg/m^3
+
+#
+# for Spar
+#
+
+set : real Diameter		= 9.4; # m
+set : real Draft		= 120.0; # m
+set : real KG                   = 30.0845; # m
+set : real Zcg			= -Draft+KG; # m
+set : real Jxx			= 4.229e9; # kg*m^2
+set : real Jyy			= 4.229e9; # kg*m^2
+set : real Jzz			= 164.2e6; # kg*m^2
+set : real Ca			= 0.96995; # added mass coef.
+set : real Cm			= Ca + 1.0;# inertia coef.
+set : real Cd			= 0.6;     # drag coef.
+set : real Cav			= 1.0;     # added mass coef. in axial direction
+set : real Cdv			= 1.0;     # drag coef. in axial direction
+set : real Length		= 2.0; # Element length of Spar (m)
+set : real BottomArea		= pi*0.25*Diameter^2; # m^2
+set : real SemiSphareVolume	= 2./3.*pi*(0.5*Diameter)^3; # m^3
+
+set : real Diameter_top		= 6.5; # m
+set : real Diameter_taper1	= Diameter_top+(Diameter-Diameter_top)/8.;
+set : real Diameter_taper2	= Diameter_top+3.*(Diameter-Diameter_top)/8.;
+set : real Diameter_taper3	= Diameter_top+5.*(Diameter-Diameter_top)/8.;
+set : real Diameter_taper4	= Diameter_top+7.*(Diameter-Diameter_top)/8.;
+
+set : real Length_top		= 4.0;  # top section length (underwater part)
+set : real Length_taper_each	= 2.0;  # 4 taper sections
+set : real Length_bottom	= 108.0;# bottom section length
+
+set : real TopArea_taper1	= 0.25*pi*(Diameter_taper1^2-Diameter_top^2);
+set : real TopArea_taper2	= 0.25*pi*(Diameter_taper2^2-Diameter_taper1^2);
+set : real TopArea_taper3	= 0.25*pi*(Diameter_taper3^2-Diameter_taper2^2);
+set : real TopArea_taper4	= 0.25*pi*(Diameter_taper4^2-Diameter_taper3^2);
+set : real TopArea_bottom	= 0.25*pi*(Diameter^2       -Diameter_taper4^2);
+
+set : real TopVolume_taper1	= 0.5*TopArea_taper1*(Diameter_taper1-Diameter_top);
+set : real TopVolume_taper2	= 0.5*TopArea_taper2*(Diameter_taper2-Diameter_taper1);
+set : real TopVolume_taper3	= 0.5*TopArea_taper3*(Diameter_taper3-Diameter_taper2);
+set : real TopVolume_taper4	= 0.5*TopArea_taper4*(Diameter_taper4-Diameter_taper3);
+set : real TopVolume_bottom	= 0.5*TopArea_bottom*(Diameter       -Diameter_taper4);
+
+#
+# for Mooring
+#
+
+set : real LineLength		= 902.2; # m
+# set : real LineLength		= 900.0; # m
+set : real LineDiameter		= 0.09017; # m
+set : real LineMass		= 77.71; # kg/m
+set : real LineWeight		= (LineMass-Rho*0.25*pi*LineDiameter^2)*Gravity; #  N/m
+set : real RhoLine = 71.165; # kg/m
+set : real Xacc			= 1.e-4;
+set : real AnchorRadius		= 853.87; # m
+set : real AnchorDepth		= -320.0; # m
+set : real FairleadRadius	= 5.2; # m
+set : real FairleadDepth	= -70.0; # m
+
+set : real EA = 3.842e8; # [N]
+# set : real EA = 3.842e7;
+set : real CA = 1.0;
+
+set : real XAP1			= AnchorRadius;
+set : real YAP1			= 0.0;
+set : real ZAP1			= AnchorDepth;
+
+set : real XAP2			= AnchorRadius*cos( pi*2./3.);
+set : real YAP2			= AnchorRadius*sin( pi*2./3.);
+set : real ZAP2			= AnchorDepth;
+
+set : real XAP3			= AnchorRadius*cos(-pi*2./3.);
+set : real YAP3			= AnchorRadius*sin(-pi*2./3.);
+set : real ZAP3			= AnchorDepth;
+
+set : real XFP1			= FairleadRadius;
+set : real YFP1			= 0.0;
+set : real ZFP1			= FairleadDepth;
+
+set : real XFP2			= FairleadRadius*cos( pi*2./3.);
+set : real YFP2			= FairleadRadius*sin( pi*2./3.);
+set : real ZFP2			= FairleadDepth;
+
+set : real XFP3			= FairleadRadius*cos(-pi*2./3.);
+set : real YFP3			= FairleadRadius*sin(-pi*2./3.);
+set : real ZFP3			= FairleadDepth;
+
+set : real VerticalForce	= 554.461e3; # vertical force from one mooring line (N)
+
+set : real Mass			= Rho*pi*0.25*(Diameter_top^2*Length_top
+					+Diameter_taper1^2*Length_taper_each
+					+Diameter_taper2^2*Length_taper_each
+					+Diameter_taper3^2*Length_taper_each
+					+Diameter_taper4^2*Length_taper_each
+					+Diameter^2*Length_bottom)
+				- VerticalForce*3/Gravity; # modify Mass for mooring (kg)
+
+#
+# for Tower
+#
+
+set : real Tower_OD_base	= 6.500; # Tower outer diameter at base (m)
+set : real Tower_OD_top		= 3.870; # Tower outer diameter at top (m)
+set : real Tower_ID_base	= 6.446; # Tower inner diameter at base (m)
+set : real Tower_ID_top		= 3.832; # Tower inner diameter at top (m)
+set : real Tower_height		= 77.600; # Tower height (m)
+set : real Tower_base_height	= 10.000; # Tower base height (m)
+set : real Tower_density	= 8502.55; # Material density (kg/m^3)
+set : real Tower_E		= 210.e9; # Young's modulus (N/m^2)
+set : real Tower_nu		= 0.3; # Poisson ratio (-)
+set : integer Tower_Nelem	= 5; # Number of elements
+set : integer Tower_id		= 60000; # ID number for tower
+#
+# induced variables for Tower
+#
+set : integer Tower_Nnode	= Tower_Nelem*2+1; # Number of nodes
+set : real Tower_dheight	= Tower_height/(Tower_Nelem*2); # Tower dheight (m)
+set : real Tower_Mass		= Tower_density*pi/12.*(
+				 (Tower_OD_base^2+Tower_OD_base*Tower_OD_top+Tower_OD_top^2)
+				-(Tower_ID_base^2+Tower_ID_base*Tower_ID_top+Tower_ID_top^2))
+				*Tower_height; # Tower Mass (kg)
+
+set : Mass			= Mass-Tower_Mass; # modify Mass for tower (kg)
+
+#
+# for RNA
+#
+
+#set : integer RNA_id		= 70000; # ID number for RNA
+set : real RNA_Mass		= 350.e3; # RNA mass (kg)
+
+set : Mass			= Mass-RNA_Mass; # modify Mass for RNA (kg)
+
+#------------------------- Data Block ------------------------------------
+
+begin: data;
+
+    problem: initial value;
+
+end: data;
+
+#------------------------- Problem Block ---------------------------------
+
+begin: initial value;
+
+    initial time: InitialTime;
+    final time: FinalTime;
+    time step: TimeStep;
+
+    tolerance: 1.e-4; # 収束判定
+    max iterations: 300; # 100 回の残差反復で収束しない場合は打ち切り
+    derivatives tolerance: 1.e-3; # ヤコビアン再計算の判定基準
+    derivatives max iterations: 100; # 同じ接線を何回使用できるか
+#   derivatives coefficient: 1.e-4;
+
+#   linear solver: naive, colamd, mt, 1; 
+    linear solver: umfpack, cc; # 線形化方程式の解法
+
+    nonlinear solver: newton raphson, modified, 1; # 線形行列を 10 ステップごとに更新
+    threads: assembly, 1;
+    method: ms, .9;
+
+end: initial value;
+
+#------------------------- Control data Block ----------------------------
+
+begin: control data; # ここで宣言することで MBDyn は先読みしてメモリを確保
+
+    # 出力制御
+    # closest next 方式で開始 0 秒から無期限まで等間隔 outputTimeStep でログを書き出す
+    output meter:
+	closest next, 0., forever,
+	const, outputTimeStep;
+
+    # 構造節点の回転角速度ベクトルをボディに固定せず，回転座標系に追随させる
+    omega rotates: yes;
+
+    # すべての剛体・節点の姿勢を Z-Y-X オイラー角で記録
+    default orientation: euler321;
+
+    # 解析に登場する節点（自由度のある"点"）を種類別に足し上げる
+    structural nodes:
+                        +1      # Platform nodes (dynamic)：6 自由度
+			+65     # Platform nodes (static)：プラットフォームの外殻など静的節点
+			+3      # Fairlead nodes (static)：各フェアリードの静的節点
+            +19*3 # 仮想ノード数 * 係留索本数
+            +1*3 # アンカーノード数 * 係留索本数
+                        +Tower_Nnode # Tower nodes (dynamic)：変数として扱う
+                        +10     # Nacelle nodes (Nacelle RotorFurl LSS HSS Generator TeeterPin Hub PitchBearingBottom1~3)：ナセル・ハブ系
+                        +3	# Blade PitchPlate (static)：ブレード・ピッチプレート
+                        +17*3   # Blade nodes (dynamic)：ブレード構造節点
+                        +17*3   # Blade_Aero nodes (static)：ブレード空力節点
+                        +10     # Dummy nodes required by AeroDyn (dummy)
+                        ;
+
+    rigid bodies:
+			+1      # Platform body
+                        +Tower_Nnode # Tower body
+                        +7	# Nacelle body
+                        +17*3   # Blade body
+                        ;
+
+    beams:
+			+Tower_Nelem  # Tower beam
+			+8*3	# Blade beam
+			;
+
+    joints:
+			+65     # Platform joints between dynamic and static nodes
+			+3      # Fairlead joints between dynamic and static nodes
+			+1	# Joint between platform and tower base
+                        +1      # Yaw Bearing (Joint between tower top and nacelle)
+                        +10     # Nacelle joint
+                        +3*3	# Pitch Bearing
+                        +3	# Blade root joint
+                        +17*3   # Blade joint which constraint Struct node and Aerodynamic node
+                        ;
+
+    gravity;
+
+    # UserDefinedElement の具体的な読み込み
+    # ここの個数と user elements の個数は合わせる
+    loadable elements:
+			+65	# spardyn
+			+3	# catenary_lm
+                        +1      # aerodyn
+                        +1      # discon
+                        ;
+
+    # output
+    abstract nodes:     +1      # To output simulation time
+                        ;
+
+    forces:             +1      # To output simulation time
+                        +1	# Drivetrain flexibility
+                        ;
+
+    genels:             +1      # To output simulation time
+                        ;
+
+end: control data;
+
+#-------------------- Reference ------------------------------------------
+
+    include: "./01_Platform3/Platform.ref";
+    include: "./02_Mooring/Mooring_lm.ref";
+    include: "./04_RNA/Nacelle.ref";
+    include: "./04_RNA/Blade.ref";
+    include: "./04_RNA/Blade_Aero.ref";
+
+#------------------------- Nodes Block -----------------------------------
+
+begin: nodes;
+
+    include: "./01_Platform3/Platform.nod";
+    include: "./02_Mooring/Mooring_lm.nod";
+    include: "./03_Tower/Tower.nod";
+    include: "./04_RNA/Nacelle.nod";
+    include: "./04_RNA/Blade.nod";
+    include: "./04_RNA/Blade_Aero.nod";
+    include: "./04_RNA/Dummy.nod";
+    # output
+    # the abstract node for output simulation time
+    abstract : 0;
+
+end: nodes;
+
+#------------------------- Elements Block --------------------------------
+
+begin: elements;
+
+      gravity:
+      	  uniform, 0., 0., -1,
+      		  cosine, InitialTime, pi/RampGravity, Gravity/2.0, half, 0.;
+
+    #----------------rigid body-------------------------------------------
+
+    include: "./01_Platform3/Platform_body.elm";
+    include: "./03_Tower/Tower_body.elm";
+    include: "./04_RNA/Nacelle_body.elm";
+    include: "./04_RNA/Blade_body.elm";
+
+    #----------------beam-------------------------------------------------
+
+    include: "./03_Tower/Tower_beam.elm";
+    include: "./04_RNA/Blade_beam.elm";
+
+    #--------------------joints-------------------------------------------
+
+    include: "./01_Platform3/Platform_joint.elm";
+    include: "./02_Mooring/Mooring_joint_lm.elm";
+    include: "./03_Tower/Tower_joint.elm";
+    include: "./04_RNA/Yaw_bearing.jnt";
+    include: "./04_RNA/Nacelle.jnt";
+    include: "./04_RNA/Pitch_bearing.jnt";
+    include: "./04_RNA/Blade_root.jnt";
+    include: "./04_RNA/Struct_Aero_total.jnt";
+
+    #--------------user elements----------------------------------- 
+
+    include: "./01_Platform3/Platform_spardyn.usr";
+    include: "./02_Mooring/Mooring_catenary_lm.usr";
+    include: "./NREL5MW_OC3Hywind_MBDyn_aerodyn13.usr";
+    include: "./NREL5MW_OC3Hywind_MBDyn_discon.usr"; 
+
+    # put the simulation time in an abstract node
+    force: 0, abstract,
+        0, abstract, time;
+    genel: 0,
+        spring support, 0, abstract, algebraic, linear elastic, 1.;
+
+end: elements;
