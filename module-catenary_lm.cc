@@ -217,7 +217,7 @@ unsigned int ModuleCatenaryLM::iGetInitialNumDof(void) const {
             dynamic_node_count++;
         }
     }
-    return dynamic_node_count * 6;
+    return dynamic_node_count * 3;
 }
 
 // 初期作業領域のサイズ定義
@@ -228,8 +228,8 @@ void ModuleCatenaryLM::InitialWorkSpaceDim(integer* piNumRows, integer* piNumCol
             dynamic_node_count++;
         }
     }
-    *piNumRows = dynamic_node_count * 6;
-    *piNumCols = dynamic_node_count * 6;
+    *piNumRows = dynamic_node_count * 3;
+    *piNumCols = dynamic_node_count * 3;
 }
 
 // 初期段階のヤコビアン行列
@@ -256,14 +256,14 @@ VariableSubMatrixHandler& ModuleCatenaryLM::InitialAssJac(
     }
 
     FullSubMatrixHandler& WM = WorkMat.SetFull();
-    WM.ResizeReset(dynamic_node_count * 6, dynamic_node_count * 6);
+    WM.ResizeReset(dynamic_node_count * 3, dynamic_node_count * 3);
 
     for (size_t i=0; i<m_nodes.size(); ++i) {
         if (is_dynamic[i]) {
             integer iFirstIndex = m_nodes[i]->iGetFirstPositionIndex();
-            int block = node_to_dynamic_block[i] * 6;
+            int block = node_to_dynamic_block[i] * 3;
             
-            for (int j=1; j<=6; j++) {
+            for (int j=1; j<=3; j++) {
                 WM.PutRowIndex(block + j, iFirstIndex + j);
                 WM.PutColIndex(block + j, iFirstIndex + j);
             }
@@ -298,8 +298,8 @@ VariableSubMatrixHandler& ModuleCatenaryLM::InitialAssJac(
             
             // 両方のノードが動的な場合
             if (is_dynamic[i] && is_dynamic[i+1]) {
-                int block1 = node_to_dynamic_block[i] * 6 + 1;
-                int block2 = node_to_dynamic_block[i+1] * 6 + 1;
+                int block1 = node_to_dynamic_block[i] * 3 + 1;
+                int block2 = node_to_dynamic_block[i+1] * 3 + 1;
                 
                 WM.Add(block1, block1, k_total);
                 WM.Add(block2, block2, k_total);
@@ -309,12 +309,12 @@ VariableSubMatrixHandler& ModuleCatenaryLM::InitialAssJac(
             }
             //  フェアリーダーが静的な場合
             else if (is_dynamic[i] && !is_dynamic[i+1]) {
-                int block1 = node_to_dynamic_block[i] * 6 + 1;
+                int block1 = node_to_dynamic_block[i] * 3 + 1;
                 WM.Add(block1, block1, k_total);
             } 
             // アンカーが静的な場合
             else if (!is_dynamic[i] && is_dynamic[i+1]) {
-                int block2 = node_to_dynamic_block[i+1] * 6 + 1;
+                int block2 = node_to_dynamic_block[i+1] * 3 + 1;
                 WM.Add(block2, block2, k_total);
             }
         }
@@ -358,15 +358,15 @@ SubVectorHandler& ModuleCatenaryLM::InitialAssRes(
         return WorkVec;
     }
 
-    WorkVec.ResizeReset(dynamic_node_count * 6);
+    WorkVec.ResizeReset(dynamic_node_count * 3);
 
     // 動的ノードのインデックス設定
     for (size_t i = 0; i < m_nodes.size(); ++i) {
         if (is_dynamic[i]) {
             integer iFirstIndex = m_nodes[i]->iGetFirstPositionIndex();
-            int block = node_to_dynamic_block[i] * 6;
+            int block = node_to_dynamic_block[i] * 3;
             
-            for (int j = 1; j <= 6; j++) {
+            for (int j = 1; j <= 3; j++) {
                 WorkVec.PutRowIndex(block + j, iFirstIndex + j);
             }
         }
@@ -411,7 +411,7 @@ SubVectorHandler& ModuleCatenaryLM::InitialAssRes(
         Vec3 F_seabed = ComputeSeabedForce(x_current, Vec3(0,0,0));
         F_total += F_seabed;
         
-        int dof_start = node_to_dynamic_block[i] * 6 + 1;
+        int dof_start = node_to_dynamic_block[i] * 3 + 1;
         WorkVec.Add(dof_start, F_total * dFSF);
     }
 
@@ -431,8 +431,8 @@ void ModuleCatenaryLM::WorkSpaceDim(integer* piNumRows, integer* piNumCols) cons
         }
     }
 
-    *piNumRows = dynamic_node_count * 6;
-    *piNumCols = dynamic_node_count * 6;
+    *piNumRows = dynamic_node_count * 3;
+    *piNumCols = dynamic_node_count * 3;
 }
 
 SubVectorHandler&
@@ -442,6 +442,8 @@ ModuleCatenaryLM::AssRes(
     const VectorHandler& XCurr, 
     const VectorHandler& XPrimeCurr)
 {
+    std::cout << "\n=== AssRes Debug: Line " << GetLabel() << " ===" << std::endl;
+
     if (m_bInitialStep) {
         std::cout << "ModuleCatenaryLM(" << GetLabel() << "): Transitioning from initial to dynamic analysis" << std::endl;
         m_bInitialStep = false;
@@ -451,7 +453,7 @@ ModuleCatenaryLM::AssRes(
     std::vector<bool> is_dynamic(m_nodes.size(), false);
     std::vector<int> node_to_dynamic_block(m_nodes.size(), -1);
 
-    for (size_t i=0; i<m_nodes.size(); ++i) {
+    for (size_t i = 0; i < m_nodes.size(); ++i) {
         const DynamicStructNode* dyn_node = dynamic_cast<const DynamicStructNode*>(m_nodes[i]);
         if (dyn_node != nullptr) {
             is_dynamic[i] = true;
@@ -465,15 +467,15 @@ ModuleCatenaryLM::AssRes(
         return WorkVec;
     }
 
-    WorkVec.ResizeReset(dynamic_node_count*6);
+    WorkVec.ResizeReset(dynamic_node_count * 3);
 
     for (size_t i = 0; i < m_nodes.size(); ++i) {
         if (is_dynamic[i]) {
-            integer iFirstIndex = m_nodes[i]->iGetFirstMomentumIndex();
-            int dof_start = node_to_dynamic_block[i]*6;
+            integer iFirstIndex = m_nodes[i]->iGetFirstPositionIndex();
+            int dof_start = node_to_dynamic_block[i] * 3;
 
-            for (int j=1; j<=6; j++) {
-                WorkVec.PutRowIndex(dof_start+j, iFirstIndex+j);
+            for (int j = 1; j <= 3; j++) {
+                WorkVec.PutRowIndex(dof_start + j, iFirstIndex + j);
             }
         }
     }
@@ -481,12 +483,24 @@ ModuleCatenaryLM::AssRes(
     doublereal dFSF = m_FSF.dGet();
     double segment_mass = m_rho_line*m_segment_length;
 
+    std::cout << "Force parameters:" << std::endl;
+    std::cout << "  Force scale factor: " << dFSF << std::endl;
+    std::cout << "  Segment mass: " << segment_mass << " kg" << std::endl;
+
+    // 重力/浮力の計算
+    Vec3 F_gravity = ComputeGravityBuoyancy(segment_mass);
+    std::cout << "  Gravity/buoyancy per segment: " << F_gravity << std::endl;
+
     for (size_t i=0; i<m_nodes.size(); ++i) {
         if (!is_dynamic[i]) continue;
 
         const StructNode* current_node = m_nodes[i];
         const Vec3& x_current = current_node->GetXCurr();
         const Vec3& v_current = current_node->GetVCurr();
+
+        std::cout << "\nNode " << i << " (ID: " << current_node->GetLabel() << "):" << std::endl;
+        std::cout << "  Position: " << x_current << std::endl;
+        std::cout << "  Velocity: " << v_current << std::endl;
 
         Vec3 F_total = Vec3(0.0, 0.0, 0.0);
 
@@ -497,6 +511,8 @@ ModuleCatenaryLM::AssRes(
             
             Vec3 F_axial_left = ComputeAxialForce(x_left, x_current, v_left, v_current);
             F_total += F_axial_left;
+
+            std::cout << "  Left axial force: " << F_axial_left << std::endl;
         }
 
         if (i < m_nodes.size() - 1) {
@@ -506,23 +522,34 @@ ModuleCatenaryLM::AssRes(
             
             Vec3 F_axial_right = ComputeAxialForce(x_current, x_right, v_current, v_right);
             F_total -= F_axial_right;
+
+            std::cout << "  Right axial force: " << -F_axial_right << std::endl;
         }
 
         double segment_contribution = 0.0;
         if (i > 0) segment_contribution += 0.5;
         if (i < m_nodes.size() - 1) segment_contribution += 0.5;
         
-        Vec3 F_gb = ComputeGravityBuoyancy(segment_mass);
-        F_total += F_gb * segment_contribution;
+        Vec3 F_gb_contribution = F_gravity * segment_contribution;
+        F_total += F_gb_contribution;
+        std::cout << "  Gravity/buoyancy contribution: " << F_gb_contribution << std::endl;
         
+        // 海底力
         Vec3 F_seabed = ComputeSeabedForce(x_current, v_current);
         F_total += F_seabed;
+        if (F_seabed.Norm() > 1e-12) {
+            std::cout << "  Seabed force: " << F_seabed << std::endl;
+        }
         
-        int dof_start = node_to_dynamic_block[i] * 6 + 1;
+        std::cout << "  Total force: " << F_total << std::endl;
+        std::cout << "  Scaled force: " << F_total * dFSF << std::endl;
+        
+        int dof_start = node_to_dynamic_block[i] * 3 + 1;
         WorkVec.Add(dof_start, F_total * dFSF);
 
     }
 
+    std::cout << "=== AssRes Debug End ===\n" << std::endl;
     return WorkVec;
 }
 
@@ -533,6 +560,8 @@ ModuleCatenaryLM::AssJac(
     const VectorHandler& XCurr, 
     const VectorHandler& XPrimeCurr)
 {
+    std::cout << "=== AssJac Debug: Line " << GetLabel() << " ===" << std::endl;
+
     int dynamic_node_count = 0;
     std::vector<bool> is_dynamic(m_nodes.size(), false);
     std::vector<int> node_to_dynamic_block(m_nodes.size(), -1);
@@ -542,36 +571,60 @@ ModuleCatenaryLM::AssJac(
         if (dyn_node != nullptr) {
             is_dynamic[i] = true;
             node_to_dynamic_block[i] = dynamic_node_count;
+            std::cout << "Dynamic node " << i << " (ID: " << m_nodes[i]->GetLabel() << ") -> block " << dynamic_node_count << std::endl;
             dynamic_node_count++;
+        } else {
+            std::cout << "Static node " << i << " (ID: " << m_nodes[i]->GetLabel() << ")" << std::endl;
         }
     }
 
+    std::cout << "Total dynamic nodes: " << dynamic_node_count << std::endl;
+
     if (dynamic_node_count == 0) {
+        std::cout << "No dynamic nodes, setting null matrix" << std::endl;
         WorkMat.SetNullMatrix();
         return WorkMat;
     }
 
     FullSubMatrixHandler& WM = WorkMat.SetFull();
-    WM.ResizeReset(dynamic_node_count * 6, dynamic_node_count * 6);
+    int matrix_size = dynamic_node_count * 3;
+    WM.ResizeReset(matrix_size, matrix_size);
+    std::cout << "Matrix size: " << matrix_size << "x" << matrix_size << std::endl;
 
+    std::vector<integer> indices;
     for (size_t i = 0; i < m_nodes.size(); ++i) {
         if (is_dynamic[i]) {
-            integer iFirstIndex = m_nodes[i]->iGetFirstPositionIndex();
-            int block = node_to_dynamic_block[i] * 6;
+            integer iFirstPosIndex = m_nodes[i]->iGetFirstPositionIndex();
+            int block = node_to_dynamic_block[i] * 3;
             
-            for (int j = 1; j <= 6; j++) {
-                WM.PutRowIndex(block + j, iFirstIndex + j);
-                WM.PutColIndex(block + j, iFirstIndex + j);
+            std::cout << "Node " << i << " (ID: " << m_nodes[i]->GetLabel() 
+                     << ") PosIndex: " << iFirstPosIndex 
+                     << " Block: " << block << std::endl;
+            
+            for (int j = 1; j <= 3; j++) {
+                WM.PutRowIndex(block + j, iFirstPosIndex + j);
+                WM.PutColIndex(block + j, iFirstPosIndex + j);
             }
         }
     }
 
     doublereal dFSF = m_FSF.dGet();
-    
-    doublereal segment_mass = m_rho_line * m_segment_length;
-    doublereal weight_per_segment = segment_mass * m_g_gravity;
-    doublereal T_min = std::max(weight_per_segment, 10000.0);
+    std::cout << "Force scale factor: " << dFSF << std::endl;
+    std::cout << "dCoef (time integration): " << dCoef << std::endl;
 
+    std::cout << "Physical parameters:" << std::endl;
+    std::cout << "  EA: " << m_EA << std::endl;
+    std::cout << "  CA: " << m_CA << std::endl;
+    std::cout << "  Segment length: " << m_segment_length << std::endl;
+    std::cout << "  Line density: " << m_rho_line << std::endl;
+
+    for (int i = 1; i <= matrix_size; ++i) {
+        for (int j = 1; j <= matrix_size; ++j) {
+            WM.PutCoef(i, j, 0.0);
+        }
+    }
+
+    std::cout << "\n--- Segment Analysis ---" << std::endl;
     for (size_t i = 0; i < m_nodes.size() - 1; ++i) {
 
         const StructNode* node1 = m_nodes[i];
@@ -581,32 +634,64 @@ ModuleCatenaryLM::AssJac(
         const Vec3& x2 = node2->GetXCurr();
         Vec3 dx = x2 - x1;
         doublereal l_current = dx.Norm();
+
+        std::cout << "Segment " << i << "-" << (i+1) << ":" << std::endl;
+        std::cout << "  Node1 pos: " << x1 << std::endl;
+        std::cout << "  Node2 pos: " << x2 << std::endl;
+        std::cout << "  Current length: " << l_current << std::endl;
+        std::cout << "  Target length: " << m_segment_length << std::endl;
         
         if (l_current > 1e-12) {
-            Vec3 t = dx / l_current;
             doublereal strain = (l_current - m_segment_length) / m_segment_length;
-            Mat3x3 Total_stiffness;
+            std::cout << "  Strain: " << strain << std::endl;
             
-            if (strain > 1e-6) {
-                doublereal k_tangent = m_EA / l_current;
-                Mat3x3 k_material = Mat3x3(MatCrossCross, t, t) * k_tangent;
-                
-                doublereal tension = std::max(m_EA * strain + T_min, T_min * 0.2);
-                doublereal k_geometric_scaler = tension / (l_current * l_current);
-                Mat3x3 k_geometric = (Eye3 - Mat3x3(MatCrossCross, t, t)) * k_geometric_scaler;
-
-                Mat3x3 k_total = (k_material + k_geometric) * dFSF;
-                Mat3x3 C_elem = k_material * (m_CA / m_EA) * dCoef * dFSF;
-                Total_stiffness = k_total + C_elem;
-                
-            } else {
-                doublereal k_tangent = T_min*0.1 / l_current;
-                Total_stiffness = Mat3x3(MatCrossCross, t, t) * k_tangent * dFSF;
+            Vec3 t = dx / l_current;
+            std::cout << "  Unit vector: " << t << std::endl;
+            
+            // 張力の計算
+            doublereal elastic_force = m_EA * strain;
+            doublereal segment_mass = m_rho_line * m_segment_length;
+            doublereal weight_per_segment = segment_mass * m_g_gravity;
+            doublereal T_min = std::max(weight_per_segment, 10000.0);
+            doublereal tension = std::max(elastic_force, T_min);
+            
+            std::cout << "  Elastic force: " << elastic_force << std::endl;
+            std::cout << "  Min tension: " << T_min << std::endl;
+            std::cout << "  Actual tension: " << tension << std::endl;
+            
+            // 剛性の計算
+            doublereal k_tangent = m_EA / l_current;
+            std::cout << "  Tangent stiffness: " << k_tangent << std::endl;
+            
+            Mat3x3 k_material = Mat3x3(MatCrossCross, t, t) * k_tangent;
+            
+            // 幾何剛性
+            doublereal k_geometric_scaler = tension / (l_current * l_current);
+            Mat3x3 k_geometric = (Eye3 - Mat3x3(MatCrossCross, t, t)) * k_geometric_scaler;
+            std::cout << "  Geometric stiffness scale: " << k_geometric_scaler << std::endl;
+            
+            Mat3x3 k_total = (k_material + k_geometric) * dFSF;
+            
+            // 減衰項
+            Mat3x3 C_elem = k_material * (m_CA / m_EA) * dCoef * dFSF;
+            Mat3x3 Total_stiffness = k_total + C_elem;
+            
+            // 行列の最大要素を確認
+            doublereal max_element = 0.0;
+            for (int row = 1; row <= 3; ++row) {
+                for (int col = 1; col <= 3; ++col) {
+                    doublereal val = fabs(Total_stiffness.dGet(row, col));
+                    if (val > max_element) max_element = val;
+                }
             }
-
+            std::cout << "  Max stiffness element: " << max_element << std::endl;
+            
+            // 剛性行列の組み立て
             if (is_dynamic[i] && is_dynamic[i+1]) {
-                int block1 = node_to_dynamic_block[i] * 6 + 1;
-                int block2 = node_to_dynamic_block[i+1] * 6 + 1;
+                int block1 = node_to_dynamic_block[i] * 3 + 1;
+                int block2 = node_to_dynamic_block[i+1] * 3 + 1;
+                
+                std::cout << "  Both dynamic: blocks " << block1 << " and " << block2 << std::endl;
                 
                 WM.Add(block1, block1, Total_stiffness);
                 WM.Add(block2, block2, Total_stiffness);
@@ -614,32 +699,65 @@ ModuleCatenaryLM::AssJac(
                 WM.Sub(block2, block1, Total_stiffness);
                 
             } else if (is_dynamic[i] && !is_dynamic[i+1]) {
-                int block1 = node_to_dynamic_block[i] * 6 + 1;
+                int block1 = node_to_dynamic_block[i] * 3 + 1;
+                std::cout << "  Node " << i << " dynamic, " << (i+1) << " static: block " << block1 << std::endl;
                 WM.Add(block1, block1, Total_stiffness);
                 
             } else if (!is_dynamic[i] && is_dynamic[i+1]) {
-                int block2 = node_to_dynamic_block[i+1] * 6 + 1;
+                int block2 = node_to_dynamic_block[i+1] * 3 + 1;
+                std::cout << "  Node " << i << " static, " << (i+1) << " dynamic: block " << block2 << std::endl;
                 WM.Add(block2, block2, Total_stiffness);
+            } else {
+                std::cout << "  Both static, no matrix contribution" << std::endl;
             }
+        } else {
+            std::cout << "  WARNING: Segment length too small, skipping" << std::endl;
         }
+        std::cout << std::endl;
     }
     
-    doublereal seabed_stiffness = std::min(m_K_seabed, 1.0e6);
     for (size_t i = 0; i < m_nodes.size(); ++i) {
         if (!is_dynamic[i]) continue;
 
-        const Vec3& pos1 = m_nodes[i]->GetXCurr();
-        if (pos1.dGet(3) < m_seabed_z && m_K_seabed > 0.0) {
-            int block = node_to_dynamic_block[i] * 6 + 3; 
-            WM.IncCoef(block, block, seabed_stiffness * dFSF);
+        const Vec3& pos = m_nodes[i]->GetXCurr();
+        if (pos.dGet(3) < m_seabed_z && m_K_seabed > 0.0) {
+            int block_z = node_to_dynamic_block[i] * 3 + 3; // Z方向（3番目）
+            doublereal seabed_stiffness = m_K_seabed * dFSF;
+            WM.IncCoef(block_z, block_z, seabed_stiffness);
+            std::cout << "Added seabed stiffness to block " << block_z << std::endl;
+        }
+    }
 
-            if (m_C_seabed > 0.0) {
-                doublereal seabed_damping = std::min(m_C_seabed, 1.0e4) * dCoef;
-                WM.IncCoef(block, block, seabed_damping * dFSF);
+    std::cout << "Adding minimum stiffness to translation DOFs..." << std::endl;
+    for (size_t i = 0; i < m_nodes.size(); ++i) {
+        if (!is_dynamic[i]) continue;
+        
+        int block_start = node_to_dynamic_block[i] * 3 + 1;
+        
+        for (int j = 0; j < 3; ++j) {  // X, Y, Z のみ
+            doublereal current_stiffness = WM.dGetCoef(block_start + j, block_start + j);
+            if (fabs(current_stiffness) < 1.0e3 * dFSF) {
+                doublereal min_stiffness = 1.0e6 * dFSF;
+                WM.PutCoef(block_start + j, block_start + j, min_stiffness);
+                std::cout << "  Set minimum stiffness [" << (block_start + j) << "] = " 
+                         << min_stiffness << std::endl;
             }
         }
     }
-        
+
+    // 最終診断
+    std::cout << "\n--- Final Matrix Diagnostics (3DOF) ---" << std::endl;
+    int zero_count = 0;
+    for (int i = 1; i <= matrix_size; ++i) {
+        doublereal diag_val = WM.dGetCoef(i, i);
+        if (fabs(diag_val) < 1e-12) {
+            zero_count++;
+            std::cout << "ERROR: Zero diagonal at (" << i << "," << i << ")" << std::endl;
+        }
+    }
+    std::cout << "Zero diagonal elements: " << zero_count << "/" << matrix_size << std::endl;
+
+    std::cout << "=== AssJac Debug End ===" << std::endl;
     return WorkMat;
 }
 
