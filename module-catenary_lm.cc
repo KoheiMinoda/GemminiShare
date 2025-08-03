@@ -573,12 +573,8 @@ ModuleCatenaryLM::AssJac(
             node_to_dynamic_block[i] = dynamic_node_count;
             std::cout << "Dynamic node " << i << " (ID: " << m_nodes[i]->GetLabel() << ") -> block " << dynamic_node_count << std::endl;
             dynamic_node_count++;
-        } else {
-            std::cout << "Static node " << i << " (ID: " << m_nodes[i]->GetLabel() << ")" << std::endl;
         }
     }
-
-    std::cout << "Total dynamic nodes: " << dynamic_node_count << std::endl;
 
     if (dynamic_node_count == 0) {
         std::cout << "No dynamic nodes, setting null matrix" << std::endl;
@@ -589,17 +585,11 @@ ModuleCatenaryLM::AssJac(
     FullSubMatrixHandler& WM = WorkMat.SetFull();
     int matrix_size = dynamic_node_count * 3;
     WM.ResizeReset(matrix_size, matrix_size);
-    std::cout << "Matrix size: " << matrix_size << "x" << matrix_size << std::endl;
 
-    std::vector<integer> indices;
     for (size_t i = 0; i < m_nodes.size(); ++i) {
         if (is_dynamic[i]) {
             integer iFirstPosIndex = m_nodes[i]->iGetFirstPositionIndex();
             int block = node_to_dynamic_block[i] * 3;
-            
-            std::cout << "Node " << i << " (ID: " << m_nodes[i]->GetLabel() 
-                     << ") PosIndex: " << iFirstPosIndex 
-                     << " Block: " << block << std::endl;
             
             for (int j = 1; j <= 3; j++) {
                 WM.PutRowIndex(block + j, iFirstPosIndex + j);
@@ -609,14 +599,9 @@ ModuleCatenaryLM::AssJac(
     }
 
     doublereal dFSF = m_FSF.dGet();
-    std::cout << "Force scale factor: " << dFSF << std::endl;
-    std::cout << "dCoef (time integration): " << dCoef << std::endl;
-
-    std::cout << "Physical parameters:" << std::endl;
-    std::cout << "  EA: " << m_EA << std::endl;
-    std::cout << "  CA: " << m_CA << std::endl;
-    std::cout << "  Segment length: " << m_segment_length << std::endl;
-    std::cout << "  Line density: " << m_rho_line << std::endl;
+    if (fabs(dFSF) < 1e-10) {
+        dFSF = 1e-6;
+    }
 
     for (int i = 1; i <= matrix_size; ++i) {
         for (int j = 1; j <= matrix_size; ++j) {
@@ -624,7 +609,21 @@ ModuleCatenaryLM::AssJac(
         }
     }
 
-    std::cout << "\n--- Segment Analysis ---" << std::endl;
+    doublereal base_stiffness = std::max(1.0e6, m_EA / m_segment_length * 0.001);
+    doublereal min_diagonal_value = base_stiffness * dFSF;
+
+    for (size_t i = 0; i < m_nodes.size(); ++i) {
+        if (!is_dynamic[i]) continue;
+        
+        int block_start = node_to_dynamic_block[i] * 3 + 1;
+        
+        for (int j = 0; j < 3; ++j) {  // X, Y, Z
+            WM.PutCoef(block_start + j, block_start + j, min_diagonal_value);
+            std::cout << "Set minimum diagonal [" << (block_start + j) << "] = " 
+                     << min_diagonal_value << std::endl;
+        }
+    }
+
     for (size_t i = 0; i < m_nodes.size() - 1; ++i) {
 
         const StructNode* node1 = m_nodes[i];
@@ -634,86 +633,47 @@ ModuleCatenaryLM::AssJac(
         const Vec3& x2 = node2->GetXCurr();
         Vec3 dx = x2 - x1;
         doublereal l_current = dx.Norm();
-
-        std::cout << "Segment " << i << "-" << (i+1) << ":" << std::endl;
-        std::cout << "  Node1 pos: " << x1 << std::endl;
-        std::cout << "  Node2 pos: " << x2 << std::endl;
-        std::cout << "  Current length: " << l_current << std::endl;
-        std::cout << "  Target length: " << m_segment_length << std::endl;
         
         if (l_current > 1e-12) {
-            doublereal strain = (l_current - m_segment_length) / m_segment_length;
-            std::cout << "  Strain: " << strain << std::endl;
-            
             Vec3 t = dx / l_current;
-            std::cout << "  Unit vector: " << t << std::endl;
+            doublereal strain = (l_current - m_segment_length) / m_segment_length;
             
-            // 張力の計算
-            doublereal elastic_force = m_EA * strain;
-            doublereal segment_mass = m_rho_line * m_segment_length;
-            doublereal weight_per_segment = segment_mass * m_g_gravity;
-            doublereal T_min = std::max(weight_per_segment, 10000.0);
-            doublereal tension = std::max(elastic_force, T_min);
-            
-            std::cout << "  Elastic force: " << elastic_force << std::endl;
-            std::cout << "  Min tension: " << T_min << std::endl;
-            std::cout << "  Actual tension: " << tension << std::endl;
-            
-            // 剛性の計算
-            doublereal k_tangent = m_EA / l_current;
-            std::cout << "  Tangent stiffness: " << k_tangent << std::endl;
-            
+            // 制限された剛性計算
+            doublereal k_tangent = std::min(m_EA / l_current, 1.0e7);
             Mat3x3 k_material = Mat3x3(MatCrossCross, t, t) * k_tangent;
             
-            // 幾何剛性
-            doublereal k_geometric_scaler = tension / (l_current * l_current);
-            Mat3x3 k_geometric = (Eye3 - Mat3x3(MatCrossCross, t, t)) * k_geometric_scaler;
-            std::cout << "  Geometric stiffness scale: " << k_geometric_scaler << std::endl;
+            // 幾何剛性も制限
+            doublereal tension = std::max(m_EA * strain, 1000.0);
+            tension = std::min(tension, 1.0e6);
+            doublereal k_geo_scale = std::min(tension / (l_current * l_current), 1.0e5);
+            Mat3x3 k_geometric = (Eye3 - Mat3x3(MatCrossCross, t, t)) * k_geo_scale;
             
             Mat3x3 k_total = (k_material + k_geometric) * dFSF;
             
             // 減衰項
-            Mat3x3 C_elem = k_material * (m_CA / m_EA) * dCoef * dFSF;
+            doublereal damping_ratio = std::min(m_CA / m_EA, 0.01); // さらに制限
+            Mat3x3 C_elem = k_material * damping_ratio * dCoef * dFSF;
             Mat3x3 Total_stiffness = k_total + C_elem;
-            
-            // 行列の最大要素を確認
-            doublereal max_element = 0.0;
-            for (int row = 1; row <= 3; ++row) {
-                for (int col = 1; col <= 3; ++col) {
-                    doublereal val = fabs(Total_stiffness.dGet(row, col));
-                    if (val > max_element) max_element = val;
-                }
-            }
-            std::cout << "  Max stiffness element: " << max_element << std::endl;
-            
-            // 剛性行列の組み立て
+
+            // 剛性行列の**追加**（Add = 既存値に加算）
             if (is_dynamic[i] && is_dynamic[i+1]) {
                 int block1 = node_to_dynamic_block[i] * 3 + 1;
                 int block2 = node_to_dynamic_block[i+1] * 3 + 1;
                 
-                std::cout << "  Both dynamic: blocks " << block1 << " and " << block2 << std::endl;
-                
-                WM.Add(block1, block1, Total_stiffness);
+                WM.Add(block1, block1, Total_stiffness);  // 既存値に加算
                 WM.Add(block2, block2, Total_stiffness);
                 WM.Sub(block1, block2, Total_stiffness);
                 WM.Sub(block2, block1, Total_stiffness);
                 
             } else if (is_dynamic[i] && !is_dynamic[i+1]) {
                 int block1 = node_to_dynamic_block[i] * 3 + 1;
-                std::cout << "  Node " << i << " dynamic, " << (i+1) << " static: block " << block1 << std::endl;
-                WM.Add(block1, block1, Total_stiffness);
+                WM.Add(block1, block1, Total_stiffness);  // 既存値に加算
                 
             } else if (!is_dynamic[i] && is_dynamic[i+1]) {
                 int block2 = node_to_dynamic_block[i+1] * 3 + 1;
-                std::cout << "  Node " << i << " static, " << (i+1) << " dynamic: block " << block2 << std::endl;
-                WM.Add(block2, block2, Total_stiffness);
-            } else {
-                std::cout << "  Both static, no matrix contribution" << std::endl;
+                WM.Add(block2, block2, Total_stiffness);  // 既存値に加算
             }
-        } else {
-            std::cout << "  WARNING: Segment length too small, skipping" << std::endl;
         }
-        std::cout << std::endl;
     }
     
     for (size_t i = 0; i < m_nodes.size(); ++i) {
@@ -722,40 +682,33 @@ ModuleCatenaryLM::AssJac(
         const Vec3& pos = m_nodes[i]->GetXCurr();
         if (pos.dGet(3) < m_seabed_z && m_K_seabed > 0.0) {
             int block_z = node_to_dynamic_block[i] * 3 + 3; // Z方向（3番目）
-            doublereal seabed_stiffness = m_K_seabed * dFSF;
+            doublereal seabed_stiffness = std::min(m_K_seabed, 1.0e5) * dFSF;
             WM.IncCoef(block_z, block_z, seabed_stiffness);
             std::cout << "Added seabed stiffness to block " << block_z << std::endl;
         }
     }
 
-    std::cout << "Adding minimum stiffness to translation DOFs..." << std::endl;
-    for (size_t i = 0; i < m_nodes.size(); ++i) {
-        if (!is_dynamic[i]) continue;
-        
-        int block_start = node_to_dynamic_block[i] * 3 + 1;
-        
-        for (int j = 0; j < 3; ++j) {  // X, Y, Z のみ
-            doublereal current_stiffness = WM.dGetCoef(block_start + j, block_start + j);
-            if (fabs(current_stiffness) < 1.0e3 * dFSF) {
-                doublereal min_stiffness = 1.0e6 * dFSF;
-                WM.PutCoef(block_start + j, block_start + j, min_stiffness);
-                std::cout << "  Set minimum stiffness [" << (block_start + j) << "] = " 
-                         << min_stiffness << std::endl;
-            }
+    doublereal min_acceptable = 1.0e-12;
+    int problematic_count = 0;
+
+    for (int i = 1; i <= matrix_size; ++i) {
+        doublereal diag_val = WM.dGetCoef(i, i);
+        if (fabs(diag_val) < min_acceptable) {
+            problematic_count++;
+            doublereal emergency_value = 1.0e4 * dFSF;
+            WM.PutCoef(i, i, emergency_value);
+            std::cout << "EMERGENCY: Set diagonal [" << i << "] = " << emergency_value << std::endl;
         }
     }
 
-    // 最終診断
-    std::cout << "\n--- Final Matrix Diagnostics (3DOF) ---" << std::endl;
-    int zero_count = 0;
+    doublereal min_diag = 1e20, max_diag = 0.0;
     for (int i = 1; i <= matrix_size; ++i) {
-        doublereal diag_val = WM.dGetCoef(i, i);
-        if (fabs(diag_val) < 1e-12) {
-            zero_count++;
-            std::cout << "ERROR: Zero diagonal at (" << i << "," << i << ")" << std::endl;
-        }
+        doublereal diag_val = fabs(WM.dGetCoef(i, i));
+        if (diag_val < min_diag) min_diag = diag_val;
+        if (diag_val > max_diag) max_diag = diag_val;
     }
-    std::cout << "Zero diagonal elements: " << zero_count << "/" << matrix_size << std::endl;
+    
+    std::cout << "Diagonal range: [" << min_diag << ", " << max_diag << "]" << std::endl;
 
     std::cout << "=== AssJac Debug End ===" << std::endl;
     return WorkMat;
